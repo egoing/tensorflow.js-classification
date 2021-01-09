@@ -8,17 +8,26 @@
 <body>
 <script>
     dfd.read_csv('https://raw.githubusercontent.com/blackdew/tensorflow1/master/csv/iris.csv').then(function(data){
+        console.log(data);
+        data.print();
         독립변수 = data.loc({columns:['꽃잎길이','꽃잎폭','꽃받침길이','꽃받침폭']});
+        독립변수.print();
         var encoder = new dfd.OneHotEncoder();
         종속변수 = encoder.fit(data['품종']);
+        data['품종'].print();
+        종속변수.print();
         
         var X = tf.input({ shape: [4]});
         var H = tf.layers.dense({ units: 4, activation:'relu'}).apply(X);
-        var Y = tf.layers.dense({ units: 3, activation:'softmax'}).apply(H);
-
+        //var Y = tf.layers.dense({ units: 3}).apply(H);
+        var Y = tf.layers.dense({ units: 3, activation:'softmax'}).apply(H);   
         model = tf.model({ inputs: X, outputs: Y });
+        
+        //var compileParam = { optimizer: tf.train.adam(), loss: tf.losses.meanSquaredError}
         var compileParam = { optimizer: tf.train.adam(), loss: 'categoricalCrossentropy', metrics:['accuracy'] }
+    
         model.compile(compileParam);
+        
         tfvis.show.modelSummary({name:'요약', tab:'모델'}, model);
 
         // 3. 데이터로 모델을 학습시킵니다. 
@@ -42,7 +51,6 @@
             예측한결과 = new dfd.DataFrame(model.predict(독립변수.tensor));
             예측한결과.print();
             종속변수.print();
-
         });  
     })
 </script>
